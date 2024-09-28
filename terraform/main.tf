@@ -42,8 +42,9 @@ resource "kubernetes_deployment" "user_service" {
         container {
           name  = "user-service"
           image = "vsuraj1127/user-service:latest"
-          ports {
-            container_port = 8700
+          
+          port {
+            container_port = 8700  # Corrected to use 'port' block
           }
         }
       }
@@ -77,8 +78,9 @@ resource "kubernetes_deployment" "order_service" {
         container {
           name  = "order-service"
           image = "vsuraj1127/order-service:latest"
-          ports {
-            container_port = 8300
+
+          port {
+            container_port = 8300  # Corrected to use 'port' block
           }
         }
       }
@@ -112,8 +114,9 @@ resource "kubernetes_deployment" "payment_service" {
         container {
           name  = "payment-service"
           image = "vsuraj1127/payment-service:latest"
-          ports {
-            container_port = 8400
+
+          port {
+            container_port = 8400  # Corrected to use 'port' block
           }
         }
       }
