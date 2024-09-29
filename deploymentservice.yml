@@ -142,7 +142,7 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
-    - host: purchase.store  # Change this to your domain
+    - host: practise.store  # Change this to your domain
       http:
         paths:
           - path: /user
