@@ -138,6 +138,7 @@ kind: Ingress
 metadata:
   name: ecommerce-ingress
   annotations:
+    kubernetes.io/ingress.class: "nginx"  # Set the Ingress class to NGINX
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
