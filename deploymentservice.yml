@@ -99,7 +99,7 @@ spec:
   ports:
     - port: 8700
       targetPort: 8700
-  type: LoadBalancer
+  type: ClusterIP
 
 ---
 
@@ -114,7 +114,7 @@ spec:
   ports:
     - port: 8300
       targetPort: 8300
-  type: LoadBalancer
+  type: ClusterIP
 
 ---
 
@@ -129,4 +129,39 @@ spec:
   ports:
     - port: 8400
       targetPort: 8400
-  type: LoadBalancer
+  type: ClusterIP
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ecommerce-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+    - host: purchase.store  # Change this to your domain
+      http:
+        paths:
+          - path: /user
+            pathType: Prefix
+            backend:
+              service:
+                name: user-service
+                port:
+                  number: 8700
+          - path: /order
+            pathType: Prefix
+            backend:
+              service:
+                name: order-service
+                port:
+                  number: 8300
+          - path: /payment
+            pathType: Prefix
+            backend:
+              service:
+                name: payment-service
+                port:
+                  number: 8400
