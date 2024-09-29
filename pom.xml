@@ -41,10 +41,12 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-sleuth-zipkin</artifactId>
+			<version>${spring-cloud.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-sleuth</artifactId>
+			<version>${spring-cloud.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
