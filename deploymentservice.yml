@@ -18,6 +18,13 @@ spec:
           image: vsuraj1127/user-service:latest
           ports:
             - containerPort: 8700
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "500m"
+            limits:
+              memory: "512Mi"
+              cpu: "1"
 
 ---
 
@@ -41,6 +48,13 @@ spec:
           image: vsuraj1127/order-service:latest
           ports:
             - containerPort: 8300
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "500m"
+            limits:
+              memory: "512Mi"
+              cpu: "1"
 
 ---
 
@@ -64,6 +78,13 @@ spec:
           image: vsuraj1127/payment-service:latest
           ports:
             - containerPort: 8400
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "500m"
+            limits:
+              memory: "512Mi"
+              cpu: "1"
 
 ---
 
