@@ -99,7 +99,7 @@ spec:
   ports:
     - port: 8700
       targetPort: 8700
-  type: LoadBalancer  # Changed to LoadBalancer
+  type: ClusterIP  # Change to ClusterIP
 
 ---
 
@@ -114,7 +114,7 @@ spec:
   ports:
     - port: 8300
       targetPort: 8300
-  type: LoadBalancer  # Changed to LoadBalancer
+  type: ClusterIP  # Change to ClusterIP
 
 ---
 
@@ -129,7 +129,7 @@ spec:
   ports:
     - port: 8400
       targetPort: 8400
-  type: LoadBalancer  # Changed to LoadBalancer
+  type: ClusterIP  # Change to ClusterIP
 
 ---
 
