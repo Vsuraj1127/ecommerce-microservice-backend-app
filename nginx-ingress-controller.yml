@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: nginx-ingress-controller
-          image: quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.47.0
+          image: quay.io/kubernetes-ingress-controller/nginx-ingress-controller:1.11.2  # Updated to a newer version
           args:
             - /nginx-ingress-controller
             - --configmap=$(POD_NAMESPACE)/nginx-configuration
