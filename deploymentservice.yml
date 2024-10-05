@@ -99,7 +99,8 @@ spec:
   ports:
     - port: 80
       targetPort: 80
-  type: ClusterIP  # Change to ClusterIP
+      nodePort: 30001  # Optional: specify a port if desired
+  type: NodePort
 
 ---
 
@@ -114,7 +115,8 @@ spec:
   ports:
     - port: 80
       targetPort: 80
-  type: ClusterIP  # Change to ClusterIP
+      nodePort: 30002  # Optional: specify a port if desired
+  type: NodePort
 
 ---
 
@@ -129,7 +131,8 @@ spec:
   ports:
     - port: 80
       targetPort: 80
-  type: ClusterIP  # Change to ClusterIP
+      nodePort: 30003  # Optional: specify a port if desired
+  type: NodePort
 
 ---
 
