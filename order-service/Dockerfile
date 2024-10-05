@@ -12,7 +12,7 @@ ENV SPRING_PROFILES_ACTIVE dev
 ADD target/order-service-v${PROJECT_VERSION}.jar order-service.jar
 
 # Expose the application port
-EXPOSE 8300
+EXPOSE 80
 
 # Command to run the application
 ENTRYPOINT ["java", "-Dspring.profiles.active=${SPRING_PROFILES_ACTIVE}", "-jar", "order-service.jar"]
