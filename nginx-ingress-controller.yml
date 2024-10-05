@@ -450,7 +450,7 @@ spec:
           failureThreshold: 5
           httpGet:
             path: /healthz
-            port: 10254
+            port: 80
             scheme: HTTP
           initialDelaySeconds: 10
           periodSeconds: 10
@@ -471,7 +471,7 @@ spec:
           failureThreshold: 3
           httpGet:
             path: /healthz
-            port: 10254
+            port: 80
             scheme: HTTP
           initialDelaySeconds: 10
           periodSeconds: 10
