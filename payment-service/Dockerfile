@@ -12,7 +12,7 @@ ENV SPRING_PROFILES_ACTIVE dev
 ADD target/payment-service-v${PROJECT_VERSION}.jar payment-service.jar
 
 # Expose the application port
-EXPOSE 8400
+EXPOSE 80
 
 # Command to run the application
 ENTRYPOINT ["java", "-Dspring.profiles.active=${SPRING_PROFILES_ACTIVE}", "-jar", "payment-service.jar"]
