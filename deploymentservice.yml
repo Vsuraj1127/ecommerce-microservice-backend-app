@@ -17,7 +17,7 @@ spec:
         - name: user-service
           image: vsuraj1127/user-service:latest
           ports:
-            - containerPort: 8700
+            - containerPort: 80
           resources:
             requests:
               memory: "256Mi"
@@ -47,7 +47,7 @@ spec:
         - name: order-service
           image: vsuraj1127/order-service:latest
           ports:
-            - containerPort: 8300
+            - containerPort: 80
           resources:
             requests:
               memory: "256Mi"
@@ -77,7 +77,7 @@ spec:
         - name: payment-service
           image: vsuraj1127/payment-service:latest
           ports:
-            - containerPort: 8400
+            - containerPort: 80
           resources:
             requests:
               memory: "256Mi"
@@ -97,8 +97,8 @@ spec:
   selector:
     app: user-service
   ports:
-    - port: 8700
-      targetPort: 8700
+    - port: 80
+      targetPort: 80
   type: ClusterIP  # Change to ClusterIP
 
 ---
@@ -112,8 +112,8 @@ spec:
   selector:
     app: order-service
   ports:
-    - port: 8300
-      targetPort: 8300
+    - port: 80
+      targetPort: 80
   type: ClusterIP  # Change to ClusterIP
 
 ---
@@ -127,8 +127,8 @@ spec:
   selector:
     app: payment-service
   ports:
-    - port: 8400
-      targetPort: 8400
+    - port: 80
+      targetPort: 80
   type: ClusterIP  # Change to ClusterIP
 
 ---
@@ -151,18 +151,18 @@ spec:
               service:
                 name: user-service
                 port:
-                  number: 8700
+                  number: 80
           - path: /order
             pathType: Prefix
             backend:
               service:
                 name: order-service
                 port:
-                  number: 8300
+                  number: 80
           - path: /payment
             pathType: Prefix
             backend:
               service:
                 name: payment-service
                 port:
-                  number: 8400
+                  number: 80
