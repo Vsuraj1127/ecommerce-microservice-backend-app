@@ -1,0 +1,249 @@
+pipeline {
+    agent any
+    tools {
+        maven 'Maven'
+    }
+
+    environment {
+        AWS_ACCESS_KEY_ID = credentials('AWS-KEY') // Ensure this is a valid credential ID in Jenkins
+        AWS_SECRET_ACCESS_KEY = credentials('AWS-KEY') // Same as above
+        USER_SERVICE_IMAGE = 'vsuraj1127/user-service'
+        ORDER_SERVICE_IMAGE = 'vsuraj1127/order-service'
+        PAYMENT_SERVICE_IMAGE = 'vsuraj1127/payment-service'
+        DOCKER_CREDENTIALS_ID = 'dockerhub'
+        SONAR_TOKEN = credentials('sonar-token')
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                echo 'Checking out the code'
+                git branch: 'branch2deploy', url: 'https://github.com/Vsuraj1127/ecommerce-microservice-backend-app.git'
+            }
+        }
+
+        stage('Linting') {
+            parallel {
+                stage('Lint User Service') {
+                    steps {
+                        script {
+                            dir('user-service') {
+                                echo 'Linting the User Service'
+                                sh 'mvn clean compile -DskipTests'
+                            }
+                        }
+                    }
+                }
+                stage('Lint Order Service') {
+                    steps {
+                        script {
+                            dir('order-service') {
+                                echo 'Linting the Order Service'
+                                sh 'mvn clean compile -DskipTests'
+                            }
+                        }
+                    }
+                }
+                stage('Lint Payment Service') {
+                    steps {
+                        script {
+                            dir('payment-service') {
+                                echo 'Linting the Payment Service'
+                                sh 'mvn clean compile -DskipTests'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Build and Analyze Services') {
+            parallel {
+                stage('Build and Analyze User Service') {
+                    steps {
+                        script {
+                            dir('user-service') {
+                                echo 'Building and Analyzing the User Service'
+                                sh 'mvn clean package -DskipTests'
+                                sh '''
+                                mvn sonar:sonar \
+                                    -Dsonar.projectKey=user-service \
+                                    -Dsonar.host.url=http://13.201.50.177:9000 \
+                                    -Dsonar.login=${SONAR_TOKEN} \
+                                    -Dsonar.java.binaries=target/classes
+                                '''
+                            }
+                        }
+                    }
+                }
+                stage('Build and Analyze Order Service') {
+                    steps {
+                        script {
+                            dir('order-service') {
+                                echo 'Building and Analyzing the Order Service'
+                                sh 'mvn clean package -DskipTests'
+                                sh '''
+                                mvn sonar:sonar \
+                                    -Dsonar.projectKey=order-service \
+                                    -Dsonar.host.url=http://13.201.50.177:9000 \
+                                    -Dsonar.login=${SONAR_TOKEN} \
+                                    -Dsonar.java.binaries=target/classes
+                                '''
+                            }
+                        }
+                    }
+                }
+                stage('Build and Analyze Payment Service') {
+                    steps {
+                        script {
+                            dir('payment-service') {
+                                echo 'Building and Analyzing the Payment Service'
+                                sh 'mvn clean package -DskipTests'
+                                sh '''
+                                mvn sonar:sonar \
+                                    -Dsonar.projectKey=payment-service \
+                                    -Dsonar.host.url=http://13.201.50.177:9000 \
+                                    -Dsonar.login=${SONAR_TOKEN} \
+                                    -Dsonar.java.binaries=target/classes
+                                '''
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Unit and Integration Testing') {
+            parallel {
+                stage('Test User Service') {
+                    steps {
+                        script {
+                            dir('user-service') {
+                                echo 'Running Unit and Integration Tests for User Service'
+                                sh 'mvn test'
+                            }
+                        }
+                    }
+                }
+                stage('Test Order Service') {
+                    steps {
+                        script {
+                            dir('order-service') {
+                                echo 'Running Unit and Integration Tests for Order Service'
+                                sh 'mvn test'
+                            }
+                        }
+                    }
+                }
+                stage('Test Payment Service') {
+                    steps {
+                        script {
+                            dir('payment-service') {
+                                echo 'Running Unit and Integration Tests for Payment Service'
+                                sh 'mvn test'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Clean Up Old Docker Images') {
+            steps {
+                script {
+                    echo 'Cleaning up old Docker images'
+                    sh 'docker rmi -f $USER_SERVICE_IMAGE || true'
+                    sh 'docker rmi -f $ORDER_SERVICE_IMAGE || true'
+                    sh 'docker rmi -f $PAYMENT_SERVICE_IMAGE || true'
+                    sh 'docker image prune -f'
+                }
+            }
+        }
+
+        stage('Docker Image Build') {
+            parallel {
+                stage('Build User Service Docker Image') {
+                    steps {
+                        script {
+                            dir('user-service') {
+                                echo 'Building Docker Image for User Service'
+                                sh 'docker build -t $USER_SERVICE_IMAGE .'
+                            }
+                        }
+                    }
+                }
+                stage('Build Order Service Docker Image') {
+                    steps {
+                        script {
+                            dir('order-service') {
+                                echo 'Building Docker Image for Order Service'
+                                sh 'docker build -t $ORDER_SERVICE_IMAGE .'
+                            }
+                        }
+                    }
+                }
+                stage('Build Payment Service Docker Image') {
+                    steps {
+                        script {
+                            dir('payment-service') {
+                                echo 'Building Docker Image for Payment Service'
+                                sh 'docker build -t $PAYMENT_SERVICE_IMAGE .'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Push to Docker Hub') {
+            steps {
+                script {
+                    withDockerRegistry(credentialsId: DOCKER_CREDENTIALS_ID) {
+                        echo 'Pushing User Service to Docker Hub'
+                        sh 'docker push $USER_SERVICE_IMAGE'
+                        echo 'Pushing Order Service to Docker Hub'
+                        sh 'docker push $ORDER_SERVICE_IMAGE'
+                        echo 'Pushing Payment Service to Docker Hub'
+                        sh 'docker push $PAYMENT_SERVICE_IMAGE'
+                    }
+                }
+            }
+        }
+
+        stage('Update kubeconfig') {
+            steps {
+                script {
+                    echo 'Updating kubeconfig for EKS'
+                    sh 'aws eks update-kubeconfig --name education-eks-6SD0DFqg --region ap-south-1'
+                }
+            }
+        }
+
+        stage('Deploy Ingress Controller') {
+            steps {
+                script {
+                    echo 'Deploying NGINX Ingress Controller'
+                    sh 'kubectl apply -f nginx-ingress-controller.yml --validate=false'
+                }
+            }
+        }
+
+        stage('Kubernetes Deployment') {
+            steps {
+                script {
+                    echo 'Deploying services to Kubernetes'
+                    sh 'kubectl apply -f deploymentservice.yml --validate=false'
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'All services built, pushed, and deployed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed. Please check the logs.'
+        }
+    }
+}
